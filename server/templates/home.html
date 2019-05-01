@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block styles %}
+    {{ super() }}
+    <style>
+        .mc-control-panel {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+        }
+
+        #mc-log {
+            overflow-y: scroll;
+            flex: 1 1 auto;
+            margin: 0 25px;
+            padding: 10px;
+            border-radius: 10px;
+            background: white;
+        }
+        #mc-log::-webkit-scrollbar { width: 0 !important }
+
+        .mc-log-line {
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+        }
+
+        #mc-controls {
+            flex: 0 1 auto;
+            margin: 25px 25px 10px 25px;
+            font-size: 200%;
+            display: flex;
+            flex-flow: row;
+        }
+        #mc-controls > div {
+            background: white;
+            border-radius: 10px;
+            padding: 0 10px;
+            line-height: 50px;
+        }
+
+        #mc-commands {
+            flex: 0 1 auto;
+            margin: 10px 25px 25px 25px;
+            display: flex;
+            flex-flow: row;
+        }
+        #mc-commands input {
+            flex: 1 1 auto;
+            height: 30px;
+            padding: 5px 20px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+        }
+
+        #mc-start {
+            color: green;
+        }
+        #mc-stop {
+            color: red;
+        }
+        .hidden-btn {
+            display: none;
+        }
+        .server-btn {
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="mc-control-panel">
+        <div id="mc-controls">
+            <div id="mc-start" class="hidden-btn server-btn" onclick="start()">&#9654;</div>
+            <div id="mc-stop" class="hidden-btn server-btn" onclick="stop()">&#10006;</div>
+            <div>Server status: <span id="mc-server-status"></span></div>
+        </div>
+        <div id="mc-log">
+
+        </div>
+        <div id="mc-commands">
+            <input id="mc-command-input" type="text" placeholder="Command&hellip;"/>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        const socket = io.connect('ws://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            socket.emit('server_status');
+        });
+
+        socket.on('server_status', function (status) {
+            set_status(status);
+        });
+
+        socket.on('server_message', function (message) {
+            appendLogLine(message)
+        });
+
+        const commandInput = document.getElementById('mc-command-input');
+        commandInput.onkeypress = e => {
+            if (e.key === 'Enter') {
+                const command = commandInput.value;
+                socket.emit('command', command);
+                commandInput.value = '';
+                appendLogLine(command);
+                return false;
+            }
+        };
+
+        function start() {
+            socket.emit('start');
+        }
+
+        function stop() {
+            socket.emit('command', 'stop');
+        }
+
+        function appendLogLine(line) {
+            const d = document.createElement('div');
+            d.innerText = line;
+            d.className = 'mc-log-line';
+            const log = document.getElementById('mc-log');
+            log.append(d);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        const startBtn = document.getElementById('mc-start');
+        const stopBtn = document.getElementById('mc-stop');
+        const statusSpan = document.getElementById('mc-server-status');
+        function set_status(status) {
+            if (status === 'stopped') {
+                startBtn.classList.remove('hidden-btn');
+                stopBtn.classList.add('hidden-btn');
+            }
+            if (status === 'running') {
+                stopBtn.classList.remove('hidden-btn');
+                startBtn.classList.add('hidden-btn');
+            }
+            statusSpan.innerText = status;
+        }
+    </script>
+{% endblock %}

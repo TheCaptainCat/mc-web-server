@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <title>Minecraft Admin Panel</title>
+    {% block styles %}
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: "Minecraft", sans-serif;
+        }
+        body {
+            background-image: url("{{ url_for('static', filename='img/stone.png') }}");
+            background-repeat: repeat;
+        }
+        @font-face {
+            font-family: "Consolas";
+            src: url("{{ url_for('static', filename='fonts/Consolas.ttf') }}");
+        }
+        @font-face {
+            font-family: "Minecraft";
+            src: url("{{ url_for('static', filename='fonts/Minecraft.ttf') }}");
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+{% block scripts %}{% endblock %}
+</html>

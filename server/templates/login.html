@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block styles %}
+    {{ super() }}
+    <style>
+        .login-container {
+            height: 100%;
+            display: flex;
+            flex-flow: column;
+        }
+
+        .flex-fill {
+            flex: 1 1 auto;
+        }
+
+        .login-form {
+            text-align: center;
+            width: 50%;
+            margin: 0 25%;
+            font-size: 200%;
+        }
+        .login-form input {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            padding: 5px 20px;
+        }
+        .login-form button {
+            border: none;
+            border-radius: 10px;
+            background: white;
+            padding: 5px 20px;
+            font-size: 100%;
+        }
+        .login-form > div {
+            padding-top: 25px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="login-container">
+        <div class="flex-fill"></div>
+        <div>
+            <form method="post" action="{{ url_for('login') }}" class="login-form">
+                <div>
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username">
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password">
+                </div>
+                <div>
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+        </div>
+        <div class="flex-fill"></div>
+    </div>
+{% endblock %}
